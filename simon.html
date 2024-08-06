@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simon Says Game</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        .btn_con {
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn {
+            width: 200px;
+            height: 200px;
+            border: 2px solid black;
+            margin: 20px 10px;
+            border-radius: 20px;
+        }
+
+        .ylo {
+            background-color: yellow;
+        }
+
+        .grn {
+            background-color: green;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .blu {
+            background-color: blue;
+        }
+
+        .flsh {
+            background-color: beige;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Simon Says Game</h1>
+    <h2>Press any Key to Start Game</h2>
+
+    <div class="btn_con">
+
+        <div class="lin1">
+            <div class="btn ylo" id="ylo"></div>
+            <div class="btn grn" id="grn"></div>
+        </div>
+
+        <div class="lin2">
+            <div class="btn red" id="red"></div>
+            <div class="btn blu" id="blu"></div>
+        </div>
+
+    </div>
+
+
+    <script>
+
+
+        let gamseq = [];
+        let usrseq = [];
+
+        let gamstrt = false;
+        let levl = 0;
+        highscor=0;
+        gameOver=false;
+
+        let allbtn = document.querySelectorAll(".btn");
+        let h2 = document.querySelector("h2")
+
+        let bclr = ['ylo', 'grn', 'red', 'blu'];
+
+
+        // start game====
+
+        document.addEventListener('keypress', () => {
+            if (gamstrt == false) {
+                console.log('game start');
+                gamstrt = true;
+
+                levlup();
+            }
+        });
+
+
+        // level change and rendom btn===
+
+        function levlup() {
+            // level up
+            usrseq = [];
+            levl++;
+            h2.innerText = `Level ${levl}`;
+
+            // rendom color to take rendom box for flash
+
+            let rndmIdx = Math.floor(Math.random() * 4);
+            // console.log(rndmIdx);  //index
+            let rndmClr = bclr[rndmIdx];
+            // console.log(rndmClr);  //color
+            let rndmBox = document.querySelector(`.${rndmClr}`);
+            // console.log(rndmBtn);  // color box
+
+            gamseq.push(rndmClr);
+            console.log(gamseq);
+
+            clrflsh(rndmBox);
+
+        };
+
+        // color flash===
+
+        function clrflsh(btnf) {   // btnf mean rndmBox
+            btnf.classList.add("flsh");
+            setTimeout(() => {
+                btnf.classList.remove("flsh");
+            }, 250);
+        };
+
+
+        // btn press=====
+
+        for (let btns of allbtn) {
+            btns.addEventListener('click', btnprs);
+        }
+
+
+        function btnprs() {
+            // console.log(this);
+            clrflsh(this);
+
+            let usrclr = this.getAttribute('id');
+            usrseq.push(usrclr);
+            // console.log(usrseq);
+
+            ckAns(usrseq.length - 1);  // mean last color
+        }
+
+        // match case
+
+        function ckAns(idx) {
+            if (gamseq[idx] == usrseq[idx]) {
+                // console.log('same value');
+                if (gamseq.length == usrseq.length) {
+                    setTimeout(levlup, 1000);
+                }
+            } else {
+                if (levl>highscor) {
+                    highscor=levl;
+                }
+                h2.innerHTML = `Game Over! Your score was ${levl} <br> Press any key to Restart or Escap to heighcsor`;
+                document.querySelector('body').style.backgroundColor = "red";
+                setTimeout(() => {
+                    document.querySelector('body').style.backgroundColor = "white";
+                }, 150);
+                rest();
+            }
+        };
+
+
+        function rest() {
+            gamstrt = false;
+            levl = 0;
+            gamseq = [];
+            usrseq = [];
+            gameOver=true;
+        };
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                if (gameOver) {
+                    h2.innerHTML = `Highest score: ${highscor} <br> Press any key to Start New Game`;
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>
